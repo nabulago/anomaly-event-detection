@@ -1,0 +1,2 @@
+# anomalous-event-detection
+An implementation of paper Detecting anomalous events in videos by learning deep representations of appearance and motion on python, opencv and tensorflow. This paper uses the stacked denoising autoencoder for the the feature training on the appearance and motion flow features as input for difference windows size and using multiple SVM as a single classifier this is work under progress if anyone can contribute I would be glad to work.
