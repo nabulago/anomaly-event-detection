@@ -17,7 +17,7 @@ trainfolders = ['Train001', 'Train006', 'Train011', 'Train016', 'Train021', 'Tra
 fileData = []
 flGray = 'wingray' # Folder where the gray motion features are stored
 # Path to the training folder as the extracted images are in the train folders
-path = '/home/eleganzit/Desktop/maruti/UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train/'
+path = 'UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train/'
 
 
 for tfds in trainfolders:
