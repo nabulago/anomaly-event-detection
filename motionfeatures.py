@@ -79,8 +79,7 @@ dpath = args['dpath']
 # fetch the files from the folder
 # datasetPath = "./Train"
 
-datasetPath = "/home/eleganzit/Desktop/maruti/\
-UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train"
+datasetPath = "/UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train"
 dPath = os.listdir(datasetPath)	# List of all the folder in the train folder
 # Folders to exclude
 listtoremove = ['._.DS_Store', '.DS_Store', 'optframe', 'optgrayframe', 'wincolor','wingray']
@@ -94,8 +93,7 @@ print dPath
 
 
 
-path = "/home/eleganzit/Desktop/maruti/\
-UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train/Train001"
+path = "/UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train/Train001"
 
 windSizes = ['15', '18', '20', 'rs18', 'rs20']
 frameSizes = [[240, 165], [252, 162], [240, 160]]
