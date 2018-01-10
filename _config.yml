@@ -2,3 +2,4 @@ theme: jekyll-theme-cayman
 title: [Anomolous event detection in video using learned features from the appearnce and motion modalities]
 description: [A simple implemenation of the paper using the python, OpenCV and TensorFlow]
 show_downloads: ["true"]
+google_analytics: [UA-112285598-1]
