@@ -1,5 +1,5 @@
 ## 
-#python oneimage.py -p /home/hduser/Desktop/Project/UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train -dd /home/hduser/Desktop/Project/data
+#python oneimage.py -p /UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train -dd Project/data
 __author__ = "Maruti Goswami"
 
 #Load images
