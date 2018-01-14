@@ -4,8 +4,11 @@ import math
 from utils import corrupt
 # from libs.utils import corrupt
 import pickle
+import sys
 
 lostOfDatasets = ['motionfeatures.p','motionfeaturesoriginal.p']
+
+# Provide data-set path here
 datasetPath = 'motionfeatures.p'
 #datasetPath = 'apperancedataset.p'
 
@@ -17,8 +20,12 @@ opendataset.close()
 # dataset = pickle.load(opendataset)
 # opendataset.close()
 
-print dataset[:,0:500].shape
-print dataset[:,501:700].shape
+if sys.version_info.major == 3:
+    print dataset[:, 0:500].shape
+    print dataset[:, 501:700].shape
+else:
+    print (dataset[:, 0:500].shape)
+    print (dataset[:, 501:700].shape)
 
 
 # for i,loD in enumerate(lostOfDatasets):
