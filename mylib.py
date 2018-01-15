@@ -164,3 +164,50 @@ def drawROI ( img, x, y, alp, winsz, color ):
     cv2.addWeighted (ovly, alp, out, 1 - alp, 0, out)
 
     return out
+
+
+def dispOpticalFlow (Image, Flow, Divisor, name ):
+    '''
+    
+    Display image with a visualisation of a flow over the top. 
+    A divisor controls the density of the quiver plot.
+    
+    Arguments:
+        Image:      Image on which to display flow lines
+        Flow :      Flow vectors x and y
+        Divisor:    Spacing between the arrow nodes
+        name:       Name of the window
+    '''
+    PictureShape = np.shape (Image)
+    # determine number of quiver points there will be
+    Imax = int (PictureShape[0] / Divisor)
+    Jmax = int (PictureShape[1] / Divisor)
+    # create a blank mask,   on which lines will be drawn.
+    mask = np.zeros_like (Image)
+    panel = np.zeros_like (Image)
+
+    for i in range (1, Imax):
+        for j in range (1, Jmax):
+            X1 = (i) * Divisor
+            Y1 = (j) * Divisor
+
+            X2 = int (X1 + Flow[X1, Y1, 1])
+            Y2 = int (Y1 + Flow[X1, Y1, 0])
+            X2 = np.clip (X2, 0, PictureShape[0])
+            Y2 = np.clip (Y2, 0, PictureShape[1])
+            # add all the lines to the mask
+
+            mask = cv2.arrowedLine (mask, (Y1, X1), (Y2, X2), [255, 255, 255], 1)
+            # To show only arrows in the image
+            # cv2.namedWindow("Panel", 0)
+            # panel = panel+mask
+            # cv2.imshow("Panel", panel)
+    # superpose lines onto image
+
+    img = cv2.add (Image, mask)
+    # print image
+    cv2.startWindowThread ()
+    cv2.namedWindow (name, 0)
+    cv2.imshow (name, img)
+
+    return []

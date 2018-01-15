@@ -131,10 +131,10 @@ if not imageDir.startswith ("._.D"):
             print "Folder : " + str (folder)
             # print "List of files: " + os.listdir(imageDir+"/"+str(folder))
             print "Fall: " + imageDir + "/" + str (folder)
-            for file in os.listdir (imageDir + "/" + str (folder)):
+            for file in os.listdir (os.path.join(imageDir,folder)):
                 # print "File: " +file
                 # print file
-                extension = os.path.splitext (file)[1]
+                extension = os.path.splitext(file)[1]
                 # print extension
                 if extension.lower () not in valid_image_extensions:
                     continue
@@ -163,8 +163,8 @@ if not imageDir.startswith ("._.D"):
 
                     for sz in winSz:
 
-                        createDirectory (dataDest + "/" + folder)
-                        createDirectory (dataDest + "/" + folder + "/" + str (sz))
+                        createDirectory (os.path.join(dataDest, folder))
+                        createDirectory (os.path.join(dataDest, folder, str(sz)))
                         if not sz == 15:
                             createDirectory (dataDest + "/" + folder + "/rs" + str (sz))
                             print "In the loop of " + str (sz)

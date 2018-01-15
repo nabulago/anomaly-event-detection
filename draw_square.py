@@ -12,7 +12,7 @@
 import cv2
 import numpy as np
 
-def drawROI(img,x,y,alp,winsz,color):
+def drawROI(img, x, y, alp, winsz, color):
 	'''
 		It will draw the ROI as transparent window with border
 
