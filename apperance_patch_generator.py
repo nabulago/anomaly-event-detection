@@ -66,33 +66,9 @@ import mylib
 
 ap = argparse.ArgumentParser (description="Apperance and Motion DeepNet")
 ap.add_argument ("-i", "--image", required=False, help="Path to the image")
-ap.add_argument ("-p", "--path", required=False, help="Directory or directories of images")
+ap.add_argument ("-p", "--path", required=False, help="Main directory of dataset")
 ap.add_argument ("-dd", "--datadst", help="Directory where you want to save dataset")
 args = vars (ap.parse_args ())
-
-
-def createDirectory ( path ):
-    if not os.path.exists (path):
-        os.mkdir (path)
-        print "Directory created : " + str (path)
-    else:
-        print "Could not create Directory"
-
-
-def resizeToMainWindowSize ( win, winSize ):
-    cv2.resize (win, (winSize, winSize), interpolation=cv2.INTER_CUBIC)
-    return win
-
-
-def resizeToMainWindowSize ( win, winSize ):
-    cv2.resize (win, (winSize[0], winSize[1]), interpolation=cv2.INTER_CUBIC)
-    return win
-
-
-def resizeToMainWindowSize ( win, winSizeW, winSizeH ):
-    cv2.resize (win, (winSizeW, winSizeH), interpolation=cv2.INTER_CUBIC)
-    return win
-
 
 # (winW,winH) = (20,20)
 winSz = [15, 18, 20]  # Thes are the window sizes for sliding window
@@ -105,6 +81,11 @@ imgCount = 0
 print "Start script"
 
 imageDir = args["path"]  # specify your path here
+if args["path"] is None:
+    imageDir = input("Plese enter the path to the dataset: ")
+    if not os.path.exists(imageDir):
+        print "Directory doen't exists"
+
 print "Directory: " + str (imageDir)
 dataDest = args["datadst"]
 image_path_list = []
@@ -121,40 +102,36 @@ imageTmp = []
 
 # fObject = open(dataDest+"/"+"imagelist.txt","a+")
 # f_main = open( dataDest+"/"+"image_15.txt","a+")
-fObject = open (dataDest + "/" + "ped2_imagelist.txt", "a+")
-f_main = open (dataDest + "/" + "ped2_image_15.txt", "a+")
+fObject = open (dataDest + "/" + "ped2_imagelist.txt", 'w')
+f_main = open (dataDest + "/" + "ped2_image_15.txt", 'w')
+
+appDataset = open(dataDest +"/apperance.p",'wb')
 
 if not imageDir.startswith ("._.D"):
+    for folder in sorted(folders):
+        if not folder.startswith ("."):
+            mylib.createDirectory(os.path.join(dataDest,folder))
+
     for folder in sorted (folders):
         print "folder : " + folder
         if not folder.startswith ("."):
             print "Folder : " + str (folder)
             # print "List of files: " + os.listdir(imageDir+"/"+str(folder))
             print "Fall: " + imageDir + "/" + str (folder)
-            for file in os.listdir (os.path.join(imageDir,folder)):
+            for file in sorted(os.listdir (os.path.join(imageDir,folder))):
                 # print "File: " +file
                 # print file
-                extension = os.path.splitext(file)[1]
-                # print extension
-                if extension.lower () not in valid_image_extensions:
+
+                if not mylib.checkValidExtension(file):
+                    print "Please provide file with proper extensions"
                     continue
+
                 tpath = str (imageDir) + "/" + str (folder) + "/" + file
-                # print "TPATH : " + str(tpath)
-                # image_path_list.append(tpath)
-                # image_path_list.append(os.path.join(imageDir, file))
-                # print tpath
-                # print image_path_list
 
 
                 # loop through image_path_list to open each image
                 for imagePath in image_path_list:
                     print imagePath
-
-                # fileList = ['001.tif','002.tif','003.tif']
-                # print image_path_list
-
-
-                # imagePath = tpi
                 image = cv2.imread (tpath, 0)
 
                 # display the image on screen with imshow()
@@ -163,35 +140,30 @@ if not imageDir.startswith ("._.D"):
 
                     for sz in winSz:
 
-                        createDirectory (os.path.join(dataDest, folder))
-                        createDirectory (os.path.join(dataDest, folder, str(sz)))
+                        # mylib.createDirectory(os.path.join(dataDest, folder))
+                        mylib.createDirectory(os.path.join(dataDest, folder, str(sz)))
                         if not sz == 15:
-                            createDirectory (dataDest + "/" + folder + "/rs" + str (sz))
+                            mylib.createDirectory (dataDest + "/" + folder + "/rs" + str (sz))
                             print "In the loop of " + str (sz)
 
                         tz = sz
 
                         if sz == 15:
-                            resized = cv2.resize (image, (240, 165), interpolation=cv2.INTER_CUBIC)
+                            resized = cv2.resize (image, (240, 165), interpolation=cv2.INTER_LINEAR)
                         # resized = resizeToMainWindowSize(image,240, 165)
                         elif sz == 18:
-                            resized = cv2.resize (image, (252, 162), interpolation=cv2.INTER_CUBIC)
+                            resized = cv2.resize (image, (252, 162), interpolation=cv2.INTER_LINEAR)
                         # resized = resizeToMainWindowSize(image,252, 162)
                         elif sz == 20:
-                            resized = cv2.resize (image, (240, 160), interpolation=cv2.INTER_CUBIC)
+                            resized = cv2.resize (image, (240, 160), interpolation=cv2.INTER_LINEAR)
                         # resized = resizeToMainWindowSize(image,240,160)
 
-                        for (x, y, window) in mylib.sliding_window (resized, stepSize=tz, windowSize=(tz, tz)):
+                        for (x, y, window) in mylib.sliding_window (resized, stepSize=15, windowSize=(tz, tz)):
 
                             # if the window does not meet our desired window size, ignore it
                             # if window.shape[0] != winH or window.shape[1] != winW:
                             if window.shape[0] != sz or window.shape[1] != sz:
                                 continue
-
-                            # THIS IS WHERE YOU WOULD PROCESS YOUR WINDOW, SUCH AS APPLYING A
-                            # MACHINE LEARNING CLASSIFIER TO CLASSIFY THE CONTENTS OF THE
-                            # WINDOW
-                            # since we do not have a classifier, we'll just draw the window
                             clone = resized.copy ()
                             # cv2.rectangle(clone, (x, y), (x + winW, y + winH), (0, 255, 0), 2)
                             cv2.rectangle (clone, (x, y), (x + sz, y + sz), (0, 255, 0), 1)
@@ -208,37 +180,28 @@ if not imageDir.startswith ("._.D"):
 
 
                             if sz == 15:
-                                nm1 = dataDest + "/" + folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (
-                                    sz) + "_" + file.split ('.')[0] + ".jpeg"
-                                fObject.writelines (
-                                    folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
-                                    file.split ('.')[0] + ".jpeg" + "\n")
-                                f_main.writelines (
-                                    folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
-                                    file.split ('.')[0] + ".jpeg" + "\n")
+                                nmi = os.path.join(folder,str(sz), str(imgCount), "_", str(sz) + "_" + file.split ('.')[0] + ".jpeg")
+                                nm1 = os.path.join(dataDest,nmi)
+                                fObject.writelines (str(nmi)+ "\n")
+                                f_main.writelines (str(nmi)+ "\n")
                                 cv2.imwrite (nm1, window)
+
                                 imgCount = imgCount + 1
 
                             if sz == 18:
                                 # print "In loop of 18"
                                 # nm1 = dataDest+"/"+ folder+ "/" + str(sz)+"/" + str(imgCount)+"_"+str(sz)+"_"+file.split('.')[0]+".jpeg"
                                 nm2 = dataDest + "/" + folder + "/" + "rs" + str (sz) + "/" + str (
-                                    imgCount) + "_" + str (sz) + "_15_" + file.split ('.')[0] + ".jpeg"
+                                    imgCount) + "_" + str (sz) + "_" + file.split ('.')[0] + ".jpeg"
                                 fObject.writelines (
                                     folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
                                 f_main.writelines (
-                                    folder + "/" + "rs" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_15_" +
+                                    folder + "/" + "rs" + str (sz) + "/" + str (imgCount) + "_" + str (sz) +"_"+
                                     file.split ('.')[0] + ".jpeg" + "\n")
-                                # print nm1
-                                # resWin = resizeToMainWindowSize(window,15,15)
-                                # print nm2
-                                # cv2.imwrite(nm,window)
-                                # tlp = str(sz)+"x"+str(sz)+" Window"
-                                # cv2.imshow(tlp,window)
-                                # cv2.imwrite(nm1,window)
+
                                 tlp1 = str (sz) + "x" + str (sz) + " Resized Window Frame"
-                                resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_CUBIC)
+                                resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_LINEAR)
                                 cv2.imshow (tlp1, resWin)
                                 cv2.imwrite (nm2, resWin)
 
@@ -249,11 +212,12 @@ if not imageDir.startswith ("._.D"):
                                 # nm1 = dataDest+"/"+ folder+ "/" + str(sz)+"/" + str(imgCount)+"_"+str(sz)+"_"+file.split('.')[0]+".jpeg"
                                 nm2 = dataDest + "/" + folder + "/" + "rs" + str (sz) + "/" + str (
                                     imgCount) + "_" + str (sz) + "_15_" + file.split ('.')[0] + ".jpeg"
+
                                 fObject.writelines (
                                     folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
                                 f_main.writelines (
-                                    folder + "/" + "rs" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_15_" +
+                                    folder + "/" + "rs" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
                                 # print nm1
                                 # print nm2
@@ -262,8 +226,9 @@ if not imageDir.startswith ("._.D"):
                                 tlp1 = str (sz) + "x" + str (sz) + " Resized Window Frame"
                                 cv2.imshow (tlp1, resWin)
                                 # cv2.imwrite(nm1,window)
-                                resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_CUBIC)
+                                resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_LINEAR)
                                 cv2.imwrite (nm2, resWin)
+
                                 imgCount = imgCount + 1
 
                             # Convert image to vector and normalize 0-1
@@ -284,9 +249,7 @@ if not imageDir.startswith ("._.D"):
 
                             # DAE section
                             #				cv2.imshow("Patch",image[x:(x+winW),y:(y+winH)])
-                            ky = cv2.waitKey (1) & 0xff
-                            if ky == 27 | ky == 'q':
-                                break
+                            mylib.exitScript()
                             time.sleep (0.025)
                             # cv2.imshow(imagePath, image)
                             # pyrCnt = 0
@@ -295,24 +258,14 @@ if not imageDir.startswith ("._.D"):
                     imgCount = 0
                 elif image is None:
                     print ("Error loading: " + imagePath)
-                # end this loop iteration and move on to next image
-
-                # wait time in milliseconds
-                # this is required to show the image
-                # 0 = wait indefinitely
-                # exit when escape key is pressed
                 # Segmentation of file ends here
                 print "End of File : " + str (file)
 
-                outk = cv2.waitKey (1) & 0xff
-                if outk == 27 | outk == 'q':
-                    break
+                mylib.exitScript ()
                     # cv2.destroyAllWindows()
         print "End of Folder : " + str (folder)
         print "Press q or esc to exit"
-        k = cv2.waitKey (1) & 0xff
-        if k == 27 | k == 'q':
-            cv2.destroyAllWindows ()
+        mylib.exitScript ()
 fObject.close ()
 f_main.close ()
 print "End of script"

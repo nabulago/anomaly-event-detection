@@ -31,8 +31,11 @@ def checkValidExtension ( fileName ):
 
     # print extension
     if valid_image_extensions.__contains__ (extension):
-        print "Contains " + str (extension)
-        # return true
+        # print "Contains " + str (extension)
+        return True
+    else:
+        return False
+
 
 
 # checkValidExtension(fileName)
@@ -102,10 +105,10 @@ def createDirectory ( path ):
             No return values
     '''
     if os.path.exists (path):
-        pass
+        print "Directory exists"
     elif not os.path.exists (path):
         os.mkdir (path)
-        print "Directory created : " + str (path)
+        print "Directory created successfully: " + str (path)
     else:
         print "Could not create Directory"
 
@@ -149,7 +152,7 @@ def drawROI ( img, x, y, alp, winsz, color ):
             color : Same color for the border and the filled color in square
 
         Returns:
-            Retuns the processed image 
+            Returns the processed image 
 
             image = drawROI('image.jpg',30,50,,0.6,20,(0,255,0))
 
@@ -158,8 +161,8 @@ def drawROI ( img, x, y, alp, winsz, color ):
     out = img.copy ()
 
     # Draw filled rectangle
-    cv2.rectangle (ovly, (x, y), (x + winsz, y + winsz), (color), -1) \
-        # Drwa line or border for rectangle
+    cv2.rectangle (ovly, (x, y), (x + winsz, y + winsz), (color), -1)
+        # Draw line or border for rectangle
     cv2.rectangle (ovly, (x, y), (x + winsz, y + winsz), (color), 2)
     cv2.addWeighted (ovly, alp, out, 1 - alp, 0, out)
 
@@ -167,7 +170,7 @@ def drawROI ( img, x, y, alp, winsz, color ):
 
 
 def dispOpticalFlow (Image, Flow, Divisor, name ):
-    '''
+    """
     
     Display image with a visualisation of a flow over the top. 
     A divisor controls the density of the quiver plot.
@@ -177,7 +180,7 @@ def dispOpticalFlow (Image, Flow, Divisor, name ):
         Flow :      Flow vectors x and y
         Divisor:    Spacing between the arrow nodes
         name:       Name of the window
-    '''
+    """
     PictureShape = np.shape (Image)
     # determine number of quiver points there will be
     Imax = int (PictureShape[0] / Divisor)
@@ -211,3 +214,15 @@ def dispOpticalFlow (Image, Flow, Divisor, name ):
     cv2.imshow (name, img)
 
     return []
+
+def exitScript():
+    ky = cv2.waitKey (1) & 0xff
+    if ky == 27:
+        print "Exiting the program"
+        os._exit(0)
+    elif ky == ord ('q'):
+        print "Exiting the program"
+        os._exit(0)
+    elif ky == ord ('e'):
+        print "Exiting the program"
+        os._exit (0)

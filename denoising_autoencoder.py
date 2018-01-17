@@ -6,10 +6,10 @@ from utils import corrupt
 import pickle
 import sys
 
-lostOfDatasets = ['motionfeatures.p','motionfeaturesoriginal.p']
+listOfDatasets = ['apperance_features_train.p','apperance_features_test.p','motion_features_train.p','motion_features_original_test.p']
 
 # Provide data-set path here
-datasetPath = 'motionfeatures.p'
+datasetPath = 'apperancefeatures.p'
 #datasetPath = 'apperancedataset.p'
 
 opendataset = open(datasetPath,'r')
@@ -20,31 +20,14 @@ opendataset.close()
 # dataset = pickle.load(opendataset)
 # opendataset.close()
 
+
+
 if sys.version_info.major == 3:
     print dataset[:, 0:500].shape
     print dataset[:, 501:700].shape
 else:
     print (dataset[:, 0:500].shape)
     print (dataset[:, 501:700].shape)
-
-
-# for i,loD in enumerate(lostOfDatasets):
-#     # This will load all the datasets and split the dataset
-#     #pickle_file = 'notMNIST.pickle'
-#     pickle_file = loD
-
-#     with open(pickle_file, 'rb') as f:
-#       save = pickle.load(f)
-#       train_dataset = save['train_dataset']
-#       train_labels = save['train_labels']
-#       valid_dataset = save['valid_dataset']
-#       valid_labels = save['valid_labels']
-#       test_dataset = save['test_dataset']
-#       test_labels = save['test_labels']
-#       del save  # hint to help gc free up memory
-#       print 'Training set' + str(train_dataset.shape) + str(train_labels.shape)
-#       print 'Validation set' + str(valid_dataset.shape) + str(valid_labels.shape)
-#       print 'Test set' + str(test_dataset.shape) + str(test_labels.shape)
 
 
 # %%
@@ -133,24 +116,101 @@ def autoencoder(dimensions=[225, 1024, 512, 256, 64]):
 
 def test_mnist():
     import tensorflow as tf
-    # import tensorflow.examples.tutorials.mnist.input_data as input_data
     import matplotlib.pyplot as plt
 
     # %%
-    # load MNIST as before
+    # load Dataset
 
     mnist = dataset # Here we will set out dataset
-    # mnist1 = dataset1
     mean_img = np.mean(mnist)
     mnist_train, mnist_test = dataset[:,0:35], dataset[:,36:51]
-    print mnist_train.shape
-    print mnist_test.shape
-    # mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+    print "Train slice of dataset" + str(mnist_train.shape)
+    print "Test slice of dataset" + str(mnist_test.shape)
+    mean_img = np.mean(mnist_train, axis=1)
+    print "Mean Image : "+str(mean_img.shape)
+    ae = autoencoder(dimensions=[225, 1024, 512, 256, 64])
+
+    # %%
+    learning_rate = 0.001
+    # optimizer = tf.train.AdamOptimizer(learning_rate).minimize(ae['cost'])
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(ae['cost'])
+
+    # %%
+    # We create a session to use the graph
+    sess = tf.Session()
+    sess.run(tf.global_variables_initializer())
+
+    # %%
+    # Fit all training data
+    batch_size = 2
+    # batch_size = 50
+    n_epochs = 10
+    for epoch_i in range(n_epochs):
+        # print mnist_train.shape[1] // batch_size
+        for batch_i in range(mnist_train.shape[1] // batch_size):
+        # for batch_i in range(mnist.train.num_examples // batch_size):
+        #     batch_xs, _ = mnist.train.next_batch(batch_size)
+            print batch_i
+            batch_xs = mnist_train[:,batch_i:batch_i + batch_size]
+            print "Batch_Xs shape "+str(batch_xs.shape)
+            print "Mean Image " + str(mean_img.shape)
+
+
+            for img in batch_xs.T:
+                print "Image shape : " + str(img.shape)
+                print "Mean Shape: " + str(mean_img.T.shape)
+
+            train = np.array([img.T - mean_img for img in batch_xs.T])
+            sess.run(optimizer, feed_dict={
+                ae['x']: train, ae['corrupt_prob']: [1.0]})
+        print(epoch_i, sess.run(ae['cost'], feed_dict={
+            ae['x']: train, ae['corrupt_prob']: [1.0]}))
+
+    # %%
+    # Plot example reconstructions
+    n_examples = 15
+    # test_xs, _ = mnist.test.next_batch(n_examples)
+    # test_xs = mnist_test.T[batch_i:batch_i + batch_size, :]
+    test_xs = mnist_test.T
+    print "Testxs : " +str(test_xs.shape)
+    test_xs_norm = np.array([img - mean_img for img in test_xs])
+    print "Test xs Norm : " + str(test_xs_norm.shape)
+
+    recon = sess.run(ae['y'], feed_dict={
+        ae['x']: test_xs_norm, ae['corrupt_prob']: [0.0]})
+    print "Reconstruction shape: " + str(recon.shape)
+    print "Reconstruction Complete"
+
+    fig, axs = plt.subplots(2, n_examples, figsize=(10, 2))
+
+    for example_i in range(n_examples):
+        axs[0][example_i].imshow(
+            # np.reshape(test_xs[example_i, :], (28, 28)))
+            np.reshape(test_xs[example_i, :], (15, 15)))
+        axs[1][example_i].imshow(
+            # np.reshape([recon[example_i, :] + mean_img], (28, 28)))
+            np.reshape([recon[example_i, :] + mean_img], (15, 15)))
+    print 'Plot complete now showing...'
+    fig.show()
+    plt.draw()
+    plt.title("1st function - mnist ones but used our dataset")
+    plt.waitforbuttonpress()
+
+
+def train_appearance_features():
+    import tensorflow as tf
+    import matplotlib.pyplot as plt
+
+    # %%
+    # load Dataset
+
+    appearance_dataset = dataset # Here we will set out dataset
+    mean_img = np.mean(appearance_dataset)
+    appearance_train, appearance_test = dataset[:,0:35], dataset[:,36:51]
+    print appearance_train.shape
+    print appearance_test.shape
     # mean_img = np.mean(mnist.train.images, axis=0)
     ae = autoencoder(dimensions=[225, 1024, 512, 256, 64])
-    ae1 = autoencoder(dimensions=[225, 1024, 512, 256, 64])
-    ae2 = autoencoder(dimensions=[450, 2048, 1024, 512, 256, 64])
-    # ae = autoencoder(dimensions=[784, 256, 64])
 
     # %%
     learning_rate = 0.001
@@ -169,11 +229,8 @@ def test_mnist():
     n_epochs = 2
     for epoch_i in range(n_epochs):
         # print mnist_train.shape[1] // batch_size
-        for batch_i in range(mnist_train.shape[1] // batch_size):
-        # for batch_i in range(mnist.train.num_examples // batch_size):
-            # batch_xs, _ = mnist.train.next_batch(batch_size)
-            # print batch_i
-            batch_xs = mnist_train.T[batch_i:batch_i + batch_size,:]
+        for batch_i in range(appearance_train.shape[1] // batch_size):
+            batch_xs = appearance_train.T[batch_i:batch_i + batch_size,:]
             train = np.array([img - mean_img for img in batch_xs])
             sess.run(optimizer, feed_dict={
                 ae['x']: train, ae['corrupt_prob']: [1.0]})
@@ -184,9 +241,11 @@ def test_mnist():
     # Plot example reconstructions
     n_examples = 15
     # test_xs, _ = mnist.test.next_batch(n_examples)
-    test_xs = mnist_test.T
-    test_xs_norm = np.array([img - mean_img for img in test_xs])
-    recon = sess.run(ae['y'], feed_dict={
+    for batch_i in range(appearance_train.shape[1]//batch_size):
+        print batch_i, appearance_train.shape[1],batch_size
+        test_xs = appearance_test.T[batch_i:batch_i+batch_size,:]
+        test_xs_norm = np.array([img - mean_img for img in test_xs])
+        recon = sess.run(ae['y'], feed_dict={
         ae['x']: test_xs_norm, ae['corrupt_prob']: [0.0]})
     fig, axs = plt.subplots(2, n_examples, figsize=(10, 2))
     for example_i in range(n_examples):
@@ -194,11 +253,21 @@ def test_mnist():
             # np.reshape(test_xs[example_i, :], (28, 28)))
             np.reshape(test_xs[example_i, :], (15, 15)))
         axs[1][example_i].imshow(
-            # np.reshape([recon[example_i, :] + mean_img], (28, 28)))
             np.reshape([recon[example_i, :] + mean_img], (15, 15)))
     fig.show()
     plt.draw()
+    plt.title('Appearance features')
     plt.waitforbuttonpress()
+
+def train_motion_features():
+    pass
+
+def train_joint_features():
+    # type: () -> object
+    pass
 
 if __name__ == '__main__':
     test_mnist()
+    # train_appearance_features()
+    # train_motion_features()
+    # train_joint_features()

@@ -179,9 +179,11 @@ for idx, f in enumerate (dPath):
             mag,  ang = cv2.cartToPolar(flow[...,  0],  flow[...,  1])
             #print flow
             xFlow,  yFlow = flow[...,  0],  flow[...,  1]
+            xFlow, yFlow = flow[..., 0], flow[..., 1]
             # Normalize horizontal and vertical components
             horz = cv2.normalize (flow[..., 0], None, 0, 255, cv2.NORM_MINMAX)
             vert = cv2.normalize(flow[..., 1],  None,  0,  255,  cv2.NORM_MINMAX)
+
             horz = horz.astype('uint8')
             vert = vert.astype('uint8')
             # Show the components as images
