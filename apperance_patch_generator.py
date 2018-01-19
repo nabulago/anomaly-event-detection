@@ -1,5 +1,13 @@
-## 
-# python oneimage.py -p /UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train -dd Project/data
+##
+# To run from console
+# python appearance_path_generator.py -p /UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train -dd Project/data
+# or
+# python --path /home/hduser/Desktop/Project/UCSD_Anomaly_Dataset.v1p2/UCSDped1/Train --datadst /home/hduser/Desktop
+
+# of if you are using the pycharm provide script arguments
+# in the ide menu Run--> Edit configurations --> Script paramters
+# Add these parameter values
+# --path your_path_to_dataset_trainfolder --datadst path_where_you_want_store_spliced_data
 __author__ = "Maruti Goswami"
 
 # Load images
@@ -81,32 +89,55 @@ imgCount = 0
 print "Start script"
 
 imageDir = args["path"]  # specify your path here
+dataDest = args["datadst"]
+
 if args["path"] is None:
-    imageDir = input("Plese enter the path to the dataset: ")
-    if not os.path.exists(imageDir):
+    imageDir = raw_input("Please enter the path to the dataset:")
+    print "Entered image dataset path:"
+    print imageDir
+    if not os.path.exists(str(imageDir)):
         print "Directory doen't exists"
 
-print "Directory: " + str (imageDir)
-dataDest = args["datadst"]
+print "Source dataset Directory: " + str (imageDir)
+
+
+
+if args["datadst"] is None:
+    dataDest = raw_input("Please enter the path where you want to store the processed or spliced images:")
+    print dataDest
+    print "Entered spliced or porcessed image dataset path:"
+    if not os.path.exists(str(dataDest)):
+        print "Directory doen't exists"
+dataDest = str (dataDest) + '/appearance_spliced_images'
+mylib.createDirectory(dataDest)
+
+print "Destination directory to store processed dataset: " + dataDest
+
+
 image_path_list = []
-valid_image_extensions = [".jpg", ".jpeg", ".png", ".tif", ".tiff"]  # specify your valid extensions here
-valid_image_extensions = [item.lower () for item in valid_image_extensions]
+
 print "start: "
 # create a list all files in directory and
-# append files with a vaild extention to image_path_list
+# append files with a valid extension to image_path_list
 folders = os.listdir (imageDir)
 print "Image directories : " + imageDir
 print "Folders: " + str (sorted (folders))
-
+folders.remove('.DS_Store')
+folders.remove('._.DS_Store')
 imageTmp = []
 
 # fObject = open(dataDest+"/"+"imagelist.txt","a+")
 # f_main = open( dataDest+"/"+"image_15.txt","a+")
-fObject = open (dataDest + "/" + "ped2_imagelist.txt", 'w')
-f_main = open (dataDest + "/" + "ped2_image_15.txt", 'w')
+fObject = open (dataDest + "/" + "all_imagelist.txt", 'w')
+f_main = open (dataDest + "/" + "all_image_15.txt", 'w')
 
-appDataset = open(dataDest +"/apperance.p",'wb')
+# fObject = open ("/home/hduser/Desktop/ped2_imagelist.txt", 'w')
+# f_main = open ("/home/hduser/Desktop/ped2_image_15.txt", 'w')
 
+appDatasetAll = open(os.path.join(dataDest,"apperance.p") ,'wb')
+appDataset15 = open(os.path.join(dataDest,"apperance15.p") ,'wb')
+appDataset18 = open(os.path.join(dataDest,"apperance18.p") ,'wb')
+appDataset20 = open(os.path.join(dataDest,"apperance20.p") ,'wb')
 if not imageDir.startswith ("._.D"):
     for folder in sorted(folders):
         if not folder.startswith ("."):
@@ -143,7 +174,7 @@ if not imageDir.startswith ("._.D"):
                         # mylib.createDirectory(os.path.join(dataDest, folder))
                         mylib.createDirectory(os.path.join(dataDest, folder, str(sz)))
                         if not sz == 15:
-                            mylib.createDirectory (dataDest + "/" + folder + "/rs" + str (sz))
+                            mylib.createDirectory (dataDest + "/" + folder + "/" + str (sz))
                             print "In the loop of " + str (sz)
 
                         tz = sz
@@ -172,32 +203,36 @@ if not imageDir.startswith ("._.D"):
                             cv2.imshow ("Clone", clone)
                             cv2.imshow ("window", window)
 
-                            # print window.flatten()
-                            # print clone[:].shape
-                            ### Uncomment to write to folder
-                            # nm = "/extimages/"+str(pyrCnt)+"_"+str(imgCount)+"_" + "" +str(sz)+ "x"+str(sz) +"_001.jpeg"
-                            # print file.split('.')[0]
-
-
                             if sz == 15:
-                                nmi = os.path.join(folder,str(sz), str(imgCount), "_", str(sz) + "_" + file.split ('.')[0] + ".jpeg")
+                                tmpFileName = str(imgCount)+ "_"+ str(sz) + "_" + file.split ('.')[0] + ".jpeg"
+                                nmi = os.path.join(folder,str(sz),tmpFileName)
+                                print nmi
                                 nm1 = os.path.join(dataDest,nmi)
                                 fObject.writelines (str(nmi)+ "\n")
                                 f_main.writelines (str(nmi)+ "\n")
                                 cv2.imwrite (nm1, window)
+                                # Flatten the image
+                                windowflat = window.flatten()
+
+                                # normalize the images
+                                windowflat = cv2.normalize(windowflat.astype(float),windowflat.astype(float), alpha=0,beta=1,norm_type=cv2.NORM_MINMAX)
+                                print windowflat
+                                pickle.dump(windowflat,appDatasetAll)
+                                pickle.dump (windowflat, appDataset15)
 
                                 imgCount = imgCount + 1
 
                             if sz == 18:
-                                # print "In loop of 18"
+                                print "In loop of 18"
                                 # nm1 = dataDest+"/"+ folder+ "/" + str(sz)+"/" + str(imgCount)+"_"+str(sz)+"_"+file.split('.')[0]+".jpeg"
-                                nm2 = dataDest + "/" + folder + "/" + "rs" + str (sz) + "/" + str (
+                                nm2 = dataDest + "/" + folder + "/" + str (sz) + "/" + str (
                                     imgCount) + "_" + str (sz) + "_" + file.split ('.')[0] + ".jpeg"
+                                print nm2
                                 fObject.writelines (
                                     folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
                                 f_main.writelines (
-                                    folder + "/" + "rs" + str (sz) + "/" + str (imgCount) + "_" + str (sz) +"_"+
+                                    folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) +"_"+
                                     file.split ('.')[0] + ".jpeg" + "\n")
 
                                 tlp1 = str (sz) + "x" + str (sz) + " Resized Window Frame"
@@ -205,19 +240,30 @@ if not imageDir.startswith ("._.D"):
                                 cv2.imshow (tlp1, resWin)
                                 cv2.imwrite (nm2, resWin)
 
+                                # Flatten the image
+                                windowflat = resWin.flatten()
+
+                                # normalize the images
+                                windowflat = cv2.normalize (windowflat.astype (float), windowflat.astype (float),
+                                                            alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+                                print windowflat
+                                pickle.dump (windowflat, appDatasetAll)
+                                pickle.dump (windowflat, appDataset18)
+
+
                                 imgCount = imgCount + 1
 
                             if sz == 20:
                                 # print "In loop of 20"
                                 # nm1 = dataDest+"/"+ folder+ "/" + str(sz)+"/" + str(imgCount)+"_"+str(sz)+"_"+file.split('.')[0]+".jpeg"
-                                nm2 = dataDest + "/" + folder + "/" + "rs" + str (sz) + "/" + str (
+                                nm2 = dataDest + "/" + folder + "/" + str (sz) + "/" + str (
                                     imgCount) + "_" + str (sz) + "_15_" + file.split ('.')[0] + ".jpeg"
 
                                 fObject.writelines (
                                     folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
                                 f_main.writelines (
-                                    folder + "/" + "rs" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
+                                    folder + "/"  + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
                                 # print nm1
                                 # print nm2
@@ -229,9 +275,17 @@ if not imageDir.startswith ("._.D"):
                                 resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_LINEAR)
                                 cv2.imwrite (nm2, resWin)
 
+                                # Flatten the image
+                                windowflat = resWin.flatten ()
+
+                                # normalize the images
+                                windowflat = cv2.normalize (windowflat.astype (float), windowflat.astype (float),
+                                                            alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+                                pickle.dump (windowflat, appDatasetAll)
+                                pickle.dump (windowflat, appDataset20)
+
                                 imgCount = imgCount + 1
 
-                            # Convert image to vector and normalize 0-1
 
                             # dae= autoencoder.DenoisingAutoencoder(model_name='dae', n_components=256, enc_act_func='tanh',dec_act_func='none', loss_func='mean_squared', num_epochs=10, batch_size=10,xavier_init=1, opt='gradient_descent', learning_rate=0.01, momentum=0.9, corr_type='none', corr_frac=0., verbose=1, seed=-1)
 
@@ -268,5 +322,9 @@ if not imageDir.startswith ("._.D"):
         mylib.exitScript ()
 fObject.close ()
 f_main.close ()
+appDatasetAll.close()
+appDataset15.close()
+appDataset18.close()
+appDataset20.close()
 print "End of script"
 print "Arguments: " + str (args)
