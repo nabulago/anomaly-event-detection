@@ -4,3 +4,4 @@ An implementation of paper **Detecting anomalous events in videos by learning de
 
 ### File details
 Most of the files contains the script and details in the files. Once scpit splices the imges of different size for apperance model: windows size - _15x15_, _18x18_, 20x20
+Denoising auto encoder file to train the model from the pickle file where you have created the dataset from the images.
