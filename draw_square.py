@@ -15,7 +15,6 @@ import numpy as np
 def drawROI(img, x, y, alp, winsz, color):
 	'''
 		It will draw the ROI as transparent window with border
-
 		Args:
 			img   : Image which you want to draw the ROI
 			x, y  : x and y starting coordinates for the ROI
@@ -25,9 +24,7 @@ def drawROI(img, x, y, alp, winsz, color):
 		
 		Returns:
 			Retuns the processed image 
-
 			image = drawROI()
-
 	'''
 	ovly = img.copy()
 	out = img.copy()
@@ -40,7 +37,7 @@ def drawROI(img, x, y, alp, winsz, color):
 
 image = cv2.imread('sampleimg.tif',0)
 image1 = cv2.imread('sampleimg.tif',1)
-print image1.shape
+print(image1.shape)
 h,w = 158,238
 wSz = 20
 x, y = 0,0
@@ -48,10 +45,10 @@ overlay1 = np.ones((15,15,3))*[0,255,0]
 # while (1):
 for j in range(0,h,wSz):
 	# myy = j+wSz
-	# print myy
+	# print(myy)
 	for i in range(0,w,wSz):
 		# myx = i +wSz
-		# print myx
+		# print(myx)
 		imgs = drawROI(image1,i+wSz,j+wSz,0.6,wSz,(255,0,0))
 		imgs = drawROI(imgs,j+wSz,i+wSz,0.6,wSz,(0,0,255))
 		cv2.imshow('Images',imgs)
