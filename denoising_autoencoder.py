@@ -1,10 +1,10 @@
-import tensorflow as tf
-import numpy as np
+import sys
 import math
+import pickle
+import numpy as np
+import tensorflow as tf
 from utils import corrupt
 # from libs.utils import corrupt
-import pickle
-import sys
 
 listOfDatasets = ['apperance_features_train.p','apperance_features_test.p','motion_features_train.p','motion_features_original_test.p']
 
@@ -54,7 +54,7 @@ def autoencoder(dimensions=[225, 1024, 512, 256, 64]):
     """
     # input to the network
     x = tf.placeholder(tf.float32, [None, dimensions[0]], name='x')
-    print tf.shape(x)
+    print(tf.shape(x))
     # Probability that we will corrupt input.
     # This is the essence of the denoising autoencoder, and is pretty
     # basic.  We'll feed forward a noisy input, allowing our network
@@ -72,7 +72,7 @@ def autoencoder(dimensions=[225, 1024, 512, 256, 64]):
     # Build the encoder
     encoder = []
     for layer_i, n_output in enumerate(dimensions[1:]):
-        print "Layer : " + str(layer_i)
+        print("Layer : " + str(layer_i))
         n_input = int(current_input.get_shape()[1])
         W = tf.Variable(
             tf.random_uniform([n_input, n_output],
@@ -83,7 +83,7 @@ def autoencoder(dimensions=[225, 1024, 512, 256, 64]):
         # output = tf.nn.tanh(tf.matmul(current_input, W) + b)
         output = tf.nn.sigmoid(tf.matmul(current_input, W) + b)
         current_input = output
-        print output
+        print(output)
     # latent representation
     z = current_input
     # Here use the classifier for the latent representaion
@@ -99,9 +99,9 @@ def autoencoder(dimensions=[225, 1024, 512, 256, 64]):
     # now have the reconstruction through the network
     y = current_input
     # cost function measures pixel-wise difference
-    print x.shape
-    print tf.shape(x)
-    print y.shape
+    print(x.shape)
+    print(tf.shape(x))
+    print(y.shape)
     print tf.shape(y)
 
     # cost = - tf.add(tf.matmul(tf.transpose(x), tf.log(y)), tf.matmul(tf.transpose(1-x), tf.log(1-y)))
@@ -114,19 +114,19 @@ def autoencoder(dimensions=[225, 1024, 512, 256, 64]):
 # %%
 
 
-def test_mnist():
+def test_dataset():
     import tensorflow as tf
     import matplotlib.pyplot as plt
 
     # %%
     # load Dataset
 
-    mnist = dataset # Here we will set out dataset
-    mean_img = np.mean(mnist)
-    mnist_train, mnist_test = dataset[:,0:35], dataset[:,36:51]
-    print "Train slice of dataset" + str(mnist_train.shape)
-    print "Test slice of dataset" + str(mnist_test.shape)
-    mean_img = np.mean(mnist_train, axis=1)
+    dataset = dataset # Here we will set out dataset
+    mean_img = np.mean(dataset)
+    dataset_train, dataset_test = dataset[:,0:35], dataset[:,36:51]
+    print "Train slice of dataset" + str(dataset_train.shape)
+    print "Test slice of dataset" + str(dataset_test.shape)
+    mean_img = np.mean(dataset_train, axis=1)
     print "Mean Image : "+str(mean_img.shape)
     ae = autoencoder(dimensions=[225, 1024, 512, 256, 64])
 
@@ -146,12 +146,12 @@ def test_mnist():
     # batch_size = 50
     n_epochs = 10
     for epoch_i in range(n_epochs):
-        # print mnist_train.shape[1] // batch_size
-        for batch_i in range(mnist_train.shape[1] // batch_size):
-        # for batch_i in range(mnist.train.num_examples // batch_size):
-        #     batch_xs, _ = mnist.train.next_batch(batch_size)
+        # print dataset_train.shape[1] // batch_size
+        for batch_i in range(dataset_train.shape[1] // batch_size):
+        # for batch_i in range(dataset.train.num_examples // batch_size):
+        #     batch_xs, _ = dataset.train.next_batch(batch_size)
             print batch_i
-            batch_xs = mnist_train[:,batch_i:batch_i + batch_size]
+            batch_xs = dataset_train[:,batch_i:batch_i + batch_size]
             print "Batch_Xs shape "+str(batch_xs.shape)
             print "Mean Image " + str(mean_img.shape)
 
@@ -169,9 +169,9 @@ def test_mnist():
     # %%
     # Plot example reconstructions
     n_examples = 15
-    # test_xs, _ = mnist.test.next_batch(n_examples)
-    # test_xs = mnist_test.T[batch_i:batch_i + batch_size, :]
-    test_xs = mnist_test.T
+    # test_xs, _ = dataset.test.next_batch(n_examples)
+    # test_xs = dataset_test.T[batch_i:batch_i + batch_size, :]
+    test_xs = dataset_test.T
     print "Testxs : " +str(test_xs.shape)
     test_xs_norm = np.array([img - mean_img for img in test_xs])
     print "Test xs Norm : " + str(test_xs_norm.shape)
@@ -193,7 +193,7 @@ def test_mnist():
     print 'Plot complete now showing...'
     fig.show()
     plt.draw()
-    plt.title("1st function - mnist ones but used our dataset")
+    plt.title("1st function - dataset ones but used our dataset")
     plt.waitforbuttonpress()
 
 
@@ -209,7 +209,7 @@ def train_appearance_features():
     appearance_train, appearance_test = dataset[:,0:35], dataset[:,36:51]
     print appearance_train.shape
     print appearance_test.shape
-    # mean_img = np.mean(mnist.train.images, axis=0)
+    # mean_img = np.mean(dataset.train.images, axis=0)
     ae = autoencoder(dimensions=[225, 1024, 512, 256, 64])
 
     # %%
@@ -228,7 +228,7 @@ def train_appearance_features():
     # batch_size = 50
     n_epochs = 2
     for epoch_i in range(n_epochs):
-        # print mnist_train.shape[1] // batch_size
+        # print dataset_train.shape[1] // batch_size
         for batch_i in range(appearance_train.shape[1] // batch_size):
             batch_xs = appearance_train.T[batch_i:batch_i + batch_size,:]
             train = np.array([img - mean_img for img in batch_xs])
@@ -240,7 +240,7 @@ def train_appearance_features():
     # %%
     # Plot example reconstructions
     n_examples = 15
-    # test_xs, _ = mnist.test.next_batch(n_examples)
+    # test_xs, _ = dataset.test.next_batch(n_examples)
     for batch_i in range(appearance_train.shape[1]//batch_size):
         print batch_i, appearance_train.shape[1],batch_size
         test_xs = appearance_test.T[batch_i:batch_i+batch_size,:]
@@ -267,7 +267,7 @@ def train_joint_features():
     pass
 
 if __name__ == '__main__':
-    test_mnist()
+    test_dataset()
     # train_appearance_features()
     # train_motion_features()
     # train_joint_features()
