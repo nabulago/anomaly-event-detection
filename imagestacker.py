@@ -21,10 +21,13 @@ def extractFileName(text):
 	#return [imageNo,tmp,imageFileName]
 
 
-
+# Dataset path where training images in format of the pickle file or other sliced image contains
 datasetPath = "/data/train/"
+# List of folders which you want to use as for now to test the codes is working 2 folders are taken
 listOfFolders = ['Train001','Train002']
+# List of slice sizes which are 15, 18 and 20 respectively
 listOfWindows = ['15','rs18','rs20']
+# Sample name for the sliced images
 imageList15 = ['0_15_001.jpeg','1_15_001.jpeg']
 imageListrs18 = ['90_rs18_15_001.jpeg','91_rs18_15_001.jpeg']
 imageListrs18 = ['120_rs20_15_001.jpeg','121_rs20_15_001.jpeg']
@@ -42,7 +45,7 @@ for lf in listOfFolders:
 		print lf+"/"+ws
 
 #imn, tst, tb = extractFileName(imageD)
-#print imn, tst, tb
-print "------------"
-print extractFileName(imageN)[2]
-print nameSplitter(extractFileName(imageN)[2])
+#print (imn, tst, tb)
+print ("------------")
+print (extractFileName(imageN)[2])
+print (nameSplitter(extractFileName(imageN)[2]))
