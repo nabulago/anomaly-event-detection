@@ -20,9 +20,9 @@ import os,os.path
 # Import MNIST data
 # from tensorflow.examples.tutorials.mnist import input_data
 # mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
-pathToDataset ="/home/eleganzit/Desktop/maruti/"
+pathToDataset ="path_to_data_folder/data"
 dataSetList = ['motionfeatures.p']
-ptdt = '/home/eleganzit/Desktop/maruti/'
+ptdt = 'path_to_data_folder/data'
 print(ptdt)
 print(dataSetList)
 print( pathToDataset+dataSetList[0])
