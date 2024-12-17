@@ -86,32 +86,32 @@ imgCount = 0
 
 # for sz in winSz:
 #	print "Window size: " + str(sz)
-print "Start script"
+print ("Start script")
 
 imageDir = args["path"]  # specify your path here
 dataDest = args["datadst"]
 
 if args["path"] is None:
     imageDir = raw_input("Please enter the path to the dataset:")
-    print "Entered image dataset path:"
-    print imageDir
+    print ("Entered image dataset path:")
+    print (imageDir)
     if not os.path.exists(str(imageDir)):
-        print "Directory doen't exists"
+        print ("Directory doen't exists")
 
-print "Source dataset Directory: " + str (imageDir)
+print ("Source dataset Directory: " + str (imageDir))
 
 
 
 if args["datadst"] is None:
     dataDest = raw_input("Please enter the path where you want to store the processed or spliced images:")
-    print dataDest
-    print "Entered spliced or porcessed image dataset path:"
+    print (dataDest)
+    print ("Entered spliced or porcessed image dataset path:")
     if not os.path.exists(str(dataDest)):
-        print "Directory doen't exists"
+        print ("Directory doen't exists")
 dataDest = str (dataDest) + '/appearance_spliced_images'
 mylib.createDirectory(dataDest)
 
-print "Destination directory to store processed dataset: " + dataDest
+print ("Destination directory to store processed dataset: " + dataDest)
 
 
 image_path_list = []
@@ -119,9 +119,9 @@ image_path_list = []
 print "start: "
 # create a list all files in directory and
 # append files with a valid extension to image_path_list
-folders = os.listdir (imageDir)
-print "Image directories : " + imageDir
-print "Folders: " + str (sorted (folders))
+folders = os.listdir(imageDir)
+print("Image directories : " + imageDir)
+print("Folders: " + str (sorted (folders)))
 folders.remove('.DS_Store')
 folders.remove('._.DS_Store')
 imageTmp = []
@@ -144,17 +144,17 @@ if not imageDir.startswith ("._.D"):
             mylib.createDirectory(os.path.join(dataDest,folder))
 
     for folder in sorted (folders):
-        print "folder : " + folder
+        print ("folder : " + folder)
         if not folder.startswith ("."):
-            print "Folder : " + str (folder)
+            print ("Folder : " + str (folder))
             # print "List of files: " + os.listdir(imageDir+"/"+str(folder))
-            print "Fall: " + imageDir + "/" + str (folder)
+            print ("Fall: " + imageDir + "/" + str (folder))
             for file in sorted(os.listdir (os.path.join(imageDir,folder))):
                 # print "File: " +file
                 # print file
 
                 if not mylib.checkValidExtension(file):
-                    print "Please provide file with proper extensions"
+                    print("Please provide file with proper extensions")
                     continue
 
                 tpath = str (imageDir) + "/" + str (folder) + "/" + file
@@ -175,7 +175,7 @@ if not imageDir.startswith ("._.D"):
                         mylib.createDirectory(os.path.join(dataDest, folder, str(sz)))
                         if not sz == 15:
                             mylib.createDirectory (dataDest + "/" + folder + "/" + str (sz))
-                            print "In the loop of " + str (sz)
+                            print ("In the loop of " + str (sz))
 
                         tz = sz
 
@@ -199,14 +199,14 @@ if not imageDir.startswith ("._.D"):
                             # cv2.rectangle(clone, (x, y), (x + winW, y + winH), (0, 255, 0), 2)
                             cv2.rectangle (clone, (x, y), (x + sz, y + sz), (0, 255, 0), 1)
 
-                            cv2.imshow ("Image", image)
-                            cv2.imshow ("Clone", clone)
-                            cv2.imshow ("window", window)
+                            #cv2.imshow ("Image", image)
+                            #cv2.imshow ("Clone", clone)
+                            #cv2.imshow ("window", window)
 
                             if sz == 15:
                                 tmpFileName = str(imgCount)+ "_"+ str(sz) + "_" + file.split ('.')[0] + ".jpeg"
                                 nmi = os.path.join(folder,str(sz),tmpFileName)
-                                print nmi
+                                print (nmi)
                                 nm1 = os.path.join(dataDest,nmi)
                                 fObject.writelines (str(nmi)+ "\n")
                                 f_main.writelines (str(nmi)+ "\n")
@@ -216,18 +216,18 @@ if not imageDir.startswith ("._.D"):
 
                                 # normalize the images
                                 windowflat = cv2.normalize(windowflat.astype(float),windowflat.astype(float), alpha=0,beta=1,norm_type=cv2.NORM_MINMAX)
-                                print windowflat
+                                print(windowflat)
                                 pickle.dump(windowflat,appDatasetAll)
                                 pickle.dump (windowflat, appDataset15)
 
                                 imgCount = imgCount + 1
 
                             if sz == 18:
-                                print "In loop of 18"
+                                print("In loop of 18")
                                 # nm1 = dataDest+"/"+ folder+ "/" + str(sz)+"/" + str(imgCount)+"_"+str(sz)+"_"+file.split('.')[0]+".jpeg"
                                 nm2 = dataDest + "/" + folder + "/" + str (sz) + "/" + str (
                                     imgCount) + "_" + str (sz) + "_" + file.split ('.')[0] + ".jpeg"
-                                print nm2
+                                print (nm2)
                                 fObject.writelines (
                                     folder + "/" + str (sz) + "/" + str (imgCount) + "_" + str (sz) + "_" +
                                     file.split ('.')[0] + ".jpeg" + "\n")
@@ -237,7 +237,7 @@ if not imageDir.startswith ("._.D"):
 
                                 tlp1 = str (sz) + "x" + str (sz) + " Resized Window Frame"
                                 resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_LINEAR)
-                                cv2.imshow (tlp1, resWin)
+                                #cv2.imshow (tlp1, resWin)
                                 cv2.imwrite (nm2, resWin)
 
                                 # Flatten the image
@@ -246,7 +246,7 @@ if not imageDir.startswith ("._.D"):
                                 # normalize the images
                                 windowflat = cv2.normalize (windowflat.astype (float), windowflat.astype (float),
                                                             alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-                                print windowflat
+                                print(windowflat)
                                 pickle.dump (windowflat, appDatasetAll)
                                 pickle.dump (windowflat, appDataset18)
 
@@ -270,7 +270,7 @@ if not imageDir.startswith ("._.D"):
                                 tlp = str (sz) + "x" + str (sz) + " Window"
                                 cv2.imshow (tlp, window)
                                 tlp1 = str (sz) + "x" + str (sz) + " Resized Window Frame"
-                                cv2.imshow (tlp1, resWin)
+                                #cv2.imshow (tlp1, resWin)
                                 # cv2.imwrite(nm1,window)
                                 resWin = cv2.resize (window, (15, 15), interpolation=cv2.INTER_LINEAR)
                                 cv2.imwrite (nm2, resWin)
@@ -304,7 +304,7 @@ if not imageDir.startswith ("._.D"):
                             # DAE section
                             #				cv2.imshow("Patch",image[x:(x+winW),y:(y+winH)])
                             mylib.exitScript()
-                            time.sleep (0.025)
+                            #time.sleep (0.025)
                             # cv2.imshow(imagePath, image)
                             # pyrCnt = 0
                             # pyrCnt = pyrCnt + 1
@@ -326,5 +326,5 @@ appDatasetAll.close()
 appDataset15.close()
 appDataset18.close()
 appDataset20.close()
-print "End of script"
-print "Arguments: " + str (args)
+print("End of script")
+print("Arguments: " + str (args))
